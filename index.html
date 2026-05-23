@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>$POOR — I Choose Poor Everytime</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Comic+Neue:wght@700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --yellow: #FFE000;
+      --black: #111111;
+      --white: #FAFAFA;
+      --red: #E63946;
+    }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'Comic Neue', cursive;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 24px 32px;
+      position: relative;
+    }
+
+    .ticker {
+      font-family: 'Bangers', cursive;
+      font-size: clamp(80px, 18vw, 180px);
+      letter-spacing: 6px;
+      color: var(--yellow);
+      text-shadow:
+        6px 6px 0 var(--black),
+        -2px -2px 0 var(--black),
+        2px -2px 0 var(--black),
+        -2px 2px 0 var(--black),
+        8px 10px 20px rgba(255,224,0,0.35);
+      line-height: 1;
+      animation: jiggle 3s ease-in-out infinite;
+    }
+
+    @keyframes jiggle {
+      0%, 100% { transform: rotate(-1.5deg) scale(1); }
+      25%       { transform: rotate(1.5deg)  scale(1.02); }
+      50%       { transform: rotate(-0.5deg) scale(1); }
+      75%       { transform: rotate(1deg)    scale(1.01); }
+    }
+
+    .ca-wrapper {
+      margin-top: 20px;
+      background: var(--yellow);
+      border: 3px solid var(--black);
+      border-radius: 12px;
+      padding: 10px 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 5px 5px 0 var(--white);
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      position: relative;
+    }
+    .ca-wrapper:active { transform: translate(3px,3px); box-shadow: 2px 2px 0 var(--white); }
+
+    .ca-label {
+      font-family: 'Bangers', cursive;
+      font-size: 18px;
+      letter-spacing: 3px;
+      color: var(--black);
+    }
+
+    .ca-address {
+      font-family: 'Comic Neue', cursive;
+      font-size: clamp(11px, 2.5vw, 15px);
+      color: var(--black);
+      word-break: break-all;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .copy-hint {
+      font-size: 10px;
+      color: #555;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .copied-msg {
+      display: none;
+      position: absolute;
+      top: -30px;
+      background: var(--red);
+      color: #fff;
+      font-family: 'Bangers', cursive;
+      letter-spacing: 2px;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    .ca-wrapper.copied .copied-msg { display: block; }
+
+    /* ── DIVIDER ── */
+    .divider {
+      width: 90%;
+      max-width: 800px;
+      height: 4px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--yellow) 0 20px,
+        transparent 20px 30px
+      );
+      margin: 0 auto;
+      border-radius: 2px;
+    }
+
+    /* ── GALLERY ── */
+    .gallery {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 28px;
+      padding: 40px 24px 60px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--white);
+      border: 4px solid var(--yellow);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 8px 8px 0 var(--yellow);
+      flex: 1 1 280px;
+      max-width: 340px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-6px) rotate(1deg);
+      box-shadow: 12px 14px 0 var(--yellow);
+    }
+    .card img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 20px;
+      font-family: 'Bangers', cursive;
+      letter-spacing: 2px;
+      color: #444;
+      font-size: 14px;
+    }
+
+    /* ── FLOATING COINS (decoration) ── */
+    .coins {
+      pointer-events: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
+    .coin {
+      position: absolute;
+      font-size: 24px;
+      opacity: 0.08;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0%   { transform: translateY(-60px) rotate(0deg); }
+      100% { transform: translateY(110vh) rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- floating coin bg -->
+  <div class="coins" id="coins"></div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="ticker">$POOR</div>
+
+    <div class="ca-wrapper" id="caBox" onclick="copyCA()">
+      <span class="copied-msg" id="copiedMsg">COPIED!</span>
+      <span class="ca-label">CA</span>
+      <span class="ca-address" id="caText">XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</span>
+      <span class="copy-hint">click to copy</span>
+    </div>
+  </header>
+
+  <div class="divider"></div>
+
+  <!-- GALLERY -->
+  <section class="gallery">
+    <div class="card">
+      <img src="img1.png" alt="I Choose Poor Everytime"/>
+    </div>
+    <div class="card">
+      <img src="img2.png" alt="Lottery Ticket Holders"/>
+    </div>
+    <div class="card">
+      <img src="img3.png" alt="Before and After $POOR"/>
+    </div>
+  </section>
+
+  <footer>$POOR — I Choose Poor Everytime 🪙</footer>
+
+  <script>
+    // Floating coins
+    const coinEl = document.getElementById('coins');
+    const emojis = ['🪙','💸','😂','🎰','📉'];
+    for (let i = 0; i < 22; i++) {
+      const c = document.createElement('span');
+      c.className = 'coin';
+      c.textContent = emojis[i % emojis.length];
+      c.style.left = Math.random() * 100 + '%';
+      c.style.animationDuration = (8 + Math.random() * 14) + 's';
+      c.style.animationDelay = (Math.random() * 12) + 's';
+      c.style.fontSize = (16 + Math.random() * 24) + 'px';
+      coinEl.appendChild(c);
+    }
+
+    // Copy CA
+    function copyCA() {
+      const ca = document.getElementById('caText').textContent;
+      navigator.clipboard.writeText(ca).catch(() => {});
+      const box = document.getElementById('caBox');
+      box.classList.add('copied');
+      setTimeout(() => box.classList.remove('copied'), 1800);
+    }
+  </script>
+</body>
+</html>
